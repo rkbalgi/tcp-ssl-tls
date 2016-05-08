@@ -10,8 +10,10 @@ import java.io.IOException;
 public class ClientTest {
 
     public static void main(String[] args) throws IOException {
-        NioTcpClient client=new NioTcpClient("localhost",8876);
+        NioTcpClient client = new NioTcpClient("localhost", 8876);
+        client.setHandler(new ClientIoHandler(2));
         client.connect();
         client.write(2, Hex.fromString("00020304050607080910"));
+        client.write(2, Hex.fromString("00020304050607080911"));
     }
 }

@@ -15,9 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by ragha on 5/8/2016.
  */
-public class ChannelHandler {
+public class ChannelEventLoop {
 
-    private static final Logger log = LoggerFactory.getLogger(ChannelHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ChannelEventLoop.class);
     private static final LinkedBlockingQueue<Selector> selectors = new LinkedBlockingQueue<Selector>();
     private static Map<Selector, IoHandler> selectorsMap = Maps.newConcurrentMap();
 

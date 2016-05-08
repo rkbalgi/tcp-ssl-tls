@@ -1,9 +1,10 @@
-package com.daalitoy.apps.tcp.tls;
+package com.daalitoy.apps.tcp.tls.server;
 
 /**
  * Created by ragha on 5/8/2016.
  */
 
+import com.daalitoy.apps.tcp.tls.IoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +21,26 @@ public class NioTcpServer {
 
     private static final Logger log = LoggerFactory.getLogger(NioTcpServer.class);
     private final int port;
-    private final IoHandler handler;
+
+    public IoHandler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(IoHandler handler) {
+        this.handler = handler;
+    }
+
+    private IoHandler handler;
     private ServerSocketChannel serverSocketChannel;
     private Selector selector =
             null;
 
     private volatile boolean running = true;
 
-    public NioTcpServer(int adjust, int port) {
+    public NioTcpServer(int port) {
 
         this.port = port;
-        handler = new IoHandler(adjust);
+
         try {
 
             serverSocketChannel = ServerSocketChannel.open();
@@ -76,8 +86,17 @@ public class NioTcpServer {
                             selector.select();
                         } catch (IOException e) {
                             e.printStackTrace();
+
                         }
                         for (SelectionKey key : selector.selectedKeys()) {
+
+                            if (!key.channel().isOpen()) {
+                                handler.channelClosed();
+                                key.cancel();
+                                break;
+
+                            }
+
                             if (key.isConnectable()) {
                                 log.debug("started listening ");
                             } else if (key.isAcceptable()) {
@@ -95,10 +114,7 @@ public class NioTcpServer {
                                 //there is data, so lets attempt to read
                                 //selector.selectedKeys().remove(key);
 
-                                if (!key.channel().isOpen()) {
-
-
-                                } else {
+                                if (key.channel().isOpen()) {
                                     handler.dataReceived(key.channel());
                                 }
 
@@ -122,6 +138,7 @@ public class NioTcpServer {
         }
 
     }
+
 
 }
 
